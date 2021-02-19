@@ -13,9 +13,9 @@ beta = 1-((1-gamma)^(1/(N-1)));
     E_R = 0;
     E_X = 0;
         for i = 0:k
-            E_R = E_R + x(2)^i;
+            E_R = E_R + x(2)^i; % Getting the average number attempts until k
             if (CWmin*(2^i) < CWmax)
-            E_X = E_X + ((CWmin*(2^i))/2)*(x(2)^i);
+            E_X = E_X + ((CWmin*(2^i))/2)*(x(2)^i); % Average duration 
             else
             E_X = E_X + (CWmax/2)*(x(2)^i); 
             end

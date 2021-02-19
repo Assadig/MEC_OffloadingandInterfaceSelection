@@ -15,7 +15,7 @@ function [E_delay] = delayAnalytic(k,N,beta,gamma,Tcoll,Tsucc,CWmin,CWmax)
     E_delay =0; % Initialising the average delay variable for a selected user
     CW = (2.^(0:k))*CWmin;  % Creating the CW vector for all the k attempts
     CW(CW>CWmax) = CWmax; % Capping the maximum valye at CWmax
-    b_mean = ((CW+1).*(CW+2))./(2*CW); % Initialising the mean value vector
+    b_mean = (CW)./(2); % Initialising the mean value vector
     Pa = 1-((1-beta)^(N-1)); % Probability of attemoting to trasmit for N-1 users
     Ps = ((N-1)*beta*(1-beta)^(N-2))/Pa; % Successfull tr prob for the N-1 users
     
