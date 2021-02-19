@@ -1,21 +1,14 @@
-function nSuccColl = succColl(k,attemptTransmit,i,nSuccColl)
-    currColl = attemptTransmit(i,:);
-    userColl = find(currColl);
+function nSuccColl = succColl(k,attemptTransmit,nSuccColl,succFlag)
+    userColl = find(attemptTransmit);
     for j = userColl
-        prevInd = flip(find(attemptTransmit(1:i,j)));
-        if(length(prevInd)>1)
-            collFlag = (sum(attemptTransmit(prevInd(2),:))>1);
-            if(nSuccColl(j) < (k-1))
-                if(collFlag == 1)
-                    nSuccColl(j) = nSuccColl(j) +1;
-                else
-                    nSuccColl(j) = 0;
-                end
+        if(succFlag(j) == 0)
+            if(nSuccColl(j) < k)
+                nSuccColl(j) = nSuccColl(j) + 1;
             else
                 nSuccColl(j) = 0;
             end
         else
-            nSuccColl(j)=0;
+            nSuccColl(j) = 0;
         end
     end
 end

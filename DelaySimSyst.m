@@ -1,13 +1,13 @@
 
-N=30;% Number of Contending Users
+N=50;% Number of Contending Users
 k=7;% Maximum number of attempts for a particular packet
-tSim = 3*10^6; % Simulation time for the entire system
+tSim = 6*10^6; % Simulation time for the entire system
 DIFS=5;      % Distributed InterFrame Spacing
 tColl = 10;  % Number Of Slots Collision b/w stations take up 
 tPacket = 20;% Average duration of each packet, same for all stations
 
 channel_status = 0; % Indication of channel stae 0:idle, 1:coll, 2:succ
-attemptTransmit = zeros(tSim,N); %Transmission attempt of each user for all time
+attemptTransmit = zeros(1,N); %Transmission attempt of each user for all time
 
 n=0; % Time indice
 c=0; % Variable to keep track of indices of succTime
@@ -33,6 +33,7 @@ R = zeros(1,N);
 
 while n <= (tSim-(tPacket+DIFS)) % While time indice is lesser than maximum tSim
  n= n+1; % Update time slot indice after each loop
+ attemptTransmit = zeros(1,N);
  if(channel_status == 0) % Checking if channel is idle
    
    for j=1:N % For each user
@@ -47,7 +48,7 @@ while n <= (tSim-(tPacket+DIFS)) % While time indice is lesser than maximum tSim
            backOff(j) = backOff(j)-1; % Decrement counter  by one
            b(j) = b(j) + 1; % Backoff for each packet for all users
        elseif(backOff(j)==0) % If backOff counter is zero
-           attemptTransmit(n,j) = 1; % Then attempt transmission
+           attemptTransmit(j) = 1; % Then attempt transmission
            R_packet(j) = R_packet(j) +1;
        end
     end
@@ -61,28 +62,29 @@ while n <= (tSim-(tPacket+DIFS)) % While time indice is lesser than maximum tSim
       channel_status=0; % Set the channel status to idle again
    end
    
-   if(sum(attemptTransmit(n,:))>1) % If more than one person has attempted to tr
+   if(sum(attemptTransmit(:))>1) % If more than one person has attempted to tr
     channel_status = 1; % Collision has occured hence channel status is set to 1
     
-    CW(attemptTransmit(n,:)==1) = 2*CW(attemptTransmit(n,:)==1); % Change the size of CW to twice the prev size
+    CW(attemptTransmit==1) = 2*CW(attemptTransmit==1); % Change the size of CW to twice the prev size
     CW(CW>CWmax) = CWmax; % Set maximum size of CW to CWmax
     
-    totColl(attemptTransmit(n,:)==1) = totColl(attemptTransmit(n,:)==1) + 1; % Increment total collison for those users by one
-    nSuccColl = succColl(k,attemptTransmit,n,nSuccColl); % Updating the successive collision number for all users
+    totColl(attemptTransmit==1) = totColl(attemptTransmit==1) + 1; % Increment total collison for those users by one
+    nSuccColl = succColl(k,attemptTransmit,nSuccColl,succFlag); % Updating the successive collision number for all users
+    succFlag(attemptTransmit==1) = 0;
     CW(nSuccColl==k) = CWmin; %If k successive collisions have happened then the packet is discarded and CW 
                               %for that user is reset to CWmin
-    for l = find(attemptTransmit(n,:)==1) % For all those users who have collided
+    for l = find(attemptTransmit==1) % For all those users who have collided
         backOff(l) = randi([0 CW(l)]); % Uniformly sample the backOff window from the new CW size
     end
     
-   elseif(sum(attemptTransmit(n,:)) == 1) % If only one user has attempted 
+   elseif(sum(attemptTransmit) == 1) % If only one user has attempted 
     countSucc = countSucc+tPacket; % Then update successfull transmitted slots
-    succFlag(attemptTransmit(n,:) == 1) = 1;
+    succFlag(attemptTransmit == 1) = 1;
     c = c+1; % Update the succTime indice
     channel_status = 2; % Update the channel status to tr succesfull busy
-    CW(attemptTransmit(n,:)==1)= CWmin; % Reset the CW to CWmin
-    succTime(c,:)= (attemptTransmit(n,:))*n ; % Record the time indice in which succesfull tr happened
-    backOff(attemptTransmit(n,:)==1) = randi([0 CWmin]); % Sample new backOff window from the updated CW which is CWmin
+    CW(attemptTransmit==1)= CWmin; % Reset the CW to CWmin
+    succTime(c,:)= (attemptTransmit)*n ; % Record the time indice in which succesfull tr happened
+    backOff(attemptTransmit==1) = randi([0 CWmin]); % Sample new backOff window from the updated CW which is CWmin
    end
 end
 
@@ -101,7 +103,7 @@ betaSim = R./bCount;
 %gammaSim = collSim./betaSim;
 %errGamma = ((gamma-gammaSim)./gamma)*100;
 
-gammaSim  = totColl./totTransmitAttempt;
+gammaSim  = totColl./R;
 
 % Avergae Delay Of System
 
