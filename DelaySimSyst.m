@@ -1,69 +1,72 @@
-timeColl = 0;% Counter for succesfull tr channel busy duration
-timeSucc = 0;% Counter for collision on channel busy duration
-c=0; % Variable to keep track of indices of succTime
+
 N=50;% Number of Contending Users
 k=7;% Maximum number of attempts for a particular packet
+tSim = 10*10^6; % Simulation time for the entire system
 
-channel_busy = 0; % Indication of channel stae 0:idle, 1:coll, 2:succ
+channel_status = 0; % Indication of channel stae 0:idle, 1:coll, 2:succ
 attemptTransmit = zeros(tSim,N); %Transmission attempt of each user for all time
 
+n=0; % Time indice
+c=0; % Variable to keep track of indices of succTime
 
-CWmin = 16;
-CWmax = 1024;
-CW= repmat(CWmin,1,N);
-backOff = randi([0 CWmin],1,N);
+CWmin = 16; % Minimum size of contention window
+CWmax = 1024; % Maximum size of contention window
+CW= repmat(CWmin,1,N); % Intialising contention window for all users
+backOff = randi([0 CWmin],1,N); % Random uniform selection of backoff from CW
+
 nSuccColl = zeros(1,N); % Variable that keeps track of successive coll for all users
-totColl = zeros(1,N);   % Total number of collisions
+totColl = zeros(1,N);   % Total number of collisions for all users
 succTime = zeros(1,N);  % Time at which successful tr happened
 
-countSucc = 0;
-bCount = 0;
-%[beta,gamma] = sys_param(k,N);
+countSucc = 0; % Total number of successful transmisions in the system
+bCount = 0; % Variable that stores the total time the system is in backoff
 
-[beta,gamma] = sys_param(k,N);
+[beta,gamma] = sys_param(k,N); % Analytical solution for transmission prob and collision prob
 
-while n <= (tSim-(tPacket+DIFS))
- n= n+1;
- if(channel_busy == 0)
-   bCount = bCount + 1;
+
+while n <= (tSim-(tPacket+DIFS)) % While time indice is lesser than maximum tSim
+ n= n+1; % Update time slot indice after each loop
+ if(channel_status == 0) % Checking if channel is idle
+   bCount = bCount + 1; % Backoff counter is increased since the channel is idle
    
-   for j=1:N
-       if(backOff(j) ~= 0)
-           backOff(j) = backOff(j)-1;
-       elseif(backOff(j)==0)
-           attemptTransmit(n,j) = 1;
+   for j=1:N % For each user
+       if(backOff(j) ~= 0) % If the backOff counter is not zero
+           backOff(j) = backOff(j)-1; % Decrement it by one
+       elseif(backOff(j)==0) % If backOff counter is zero
+           attemptTransmit(n,j) = 1; % Then attempt transmission
        end
     end
  end
    
-   if(channel_busy == 1)
-      n = n+(timeColl-1); 
-      channel_busy=0;
-   elseif(channel_busy == 2)
-      n = n+(timeSucc-1); 
-      channel_busy=0;
+   if(channel_status == 1) % If the channel is busy due to collison
+      n = n+(tColl+DIFS-1);% Fast forward time indice by Tcoll slots
+      channel_status=0; % Set channel status to idle again
+   elseif(channel_status == 2)% If the channel is busy due to successfull tr
+      n = n+(timeSucc-1); % Fast forward time indice by Tsucc slots
+      channel_status=0; % Set the channel status to idle again
    end
    
-   if(sum(attemptTransmit(n,:))>1)
-    channel_busy = 1;
-    timeColl= (tColl + DIFS);
-    CW(attemptTransmit(n,:)==1) = 2*CW(attemptTransmit(n,:)==1);
-    CW(CW>1024) = 1024;
-    totColl(attemptTransmit(n,:)==1) = totColl(attemptTransmit(n,:)==1) + 1;
+   if(sum(attemptTransmit(n,:))>1) % If more than one person has attempted to tr
+    channel_status = 1; % Collision has occured hence channel status is set to 1
     
-    nSuccColl = succColl(k,attemptTransmit,n,nSuccColl);
-    CW(nSuccColl==k) = CWmin;
-    for l = find(attemptTransmit(n,:)==1)
-        backOff(l) = randi([0 CW(l)]);
+    CW(attemptTransmit(n,:)==1) = 2*CW(attemptTransmit(n,:)==1); % Change the size of CW to twice the prev size
+    CW(CW>CWmax) = CWmax; % Set maximum size of CW to CWmax
+    
+    totColl(attemptTransmit(n,:)==1) = totColl(attemptTransmit(n,:)==1) + 1; % Increment total collison for those users by one
+    nSuccColl = succColl(k,attemptTransmit,n,nSuccColl); % Updating the successive collision number for all users
+    CW(nSuccColl==k) = CWmin; %If k successive collisions have happened then the packet is discarded and CW 
+                              %for that user is reset to CWmin
+    for l = find(attemptTransmit(n,:)==1) % For all those users who have collided
+        backOff(l) = randi([0 CW(l)]); % Uniformly sample the backOff window from the new CW size
     end
-   elseif(sum(attemptTransmit(n,:)) == 1)
-    countSucc = countSucc+tPacket;
-    c = c+1;
-    channel_busy = 2;
-    timeSucc = (tPacket + DIFS);
-    CW(attemptTransmit(n,:)==1)= CWmin;
-    succTime(c,:)= (attemptTransmit(n,:))*n ;
-    backOff(attemptTransmit(n,:)==1) = randi([0 CWmin]);
+    
+   elseif(sum(attemptTransmit(n,:)) == 1) % If only one user has attempted 
+    countSucc = countSucc+tPacket; % Then update successfull transmitted slots
+    c = c+1; % Update the succTime indice
+    channel_status = 2; % Update the channel status to tr succesfull busy
+    CW(attemptTransmit(n,:)==1)= CWmin; % Reset the CW to CWmin
+    succTime(c,:)= (attemptTransmit(n,:))*n ; % Record the time indice in which succesfull tr happened
+    backOff(attemptTransmit(n,:)==1) = randi([0 CWmin]); % Sample new backOff window from the updated CW which is CWmin
    end
 end
 
@@ -82,23 +85,15 @@ collSim = totColl/bCount;
 %gammaSim = collSim./betaSim;
 %errGamma = ((gamma-gammaSim)./gamma)*100;
 
-gammaSim  = collSim./betaSim{floor(N/10),plotVar};
+gammaSim  = collSim./betaSim;
 
 % Avergae Delay Of System
 
 E_DelaySim = succDelay(succTime);
-E_Delay = delayAnalytic(k,N,beta{floor(N/10),plotVar},gamma{floor(N/10),plotVar},tColl + DIFS,tPacket + DIFS,CWmin,CWmax);
-% errE_delay{floor(N/10),plot} = ((E_Delay{floor(N/10),plot}-E_DelaySim{floor(N/10),plot})./E_Delay{floor(N/10),plot})*100;
-
-% E_Delay = delaySystem(k,N,beta,gamma,tColl + DIFS,tPacket + DIFS,CWmin,CWmax);
-% E_DelaySim = succDelay(succTime);
-% errE_delay = ((E_Delay-E_DelaySim)./E_Delay)*100;
+E_Delay = delayAnalytic(k,N,beta,gamma,tColl + DIFS,tPacket + DIFS,CWmin,CWmax);
 
 
 % System ThroughPut 
 
-% S_sim = countSucc/n;
-% S = throughPutSys(N,beta,tPacket,tPacket+DIFS,tColl+DIFS);
-
 S_sim = countSucc/n;
-S = throughPutSys(N,beta{floor(N/10),plotVar},tPacket,tPacket+DIFS,tColl+DIFS);
+S = throughPutSys(N,beta,tPacket,tPacket+DIFS,tColl+DIFS);
