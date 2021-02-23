@@ -1,7 +1,8 @@
+function [S,S_sim,E_Delay,E_DelaySim,beta,betaSim,gamma,gammaSim] = DelaySimSyst(k,N,tSim)
 
-N=50;% Number of Contending Users
-k=7;% Maximum number of attempts for a particular packet
-tSim = 6*10^6; % Simulation time for the entire system
+%N=50;% Number of Contending Users
+%k=7;% Maximum number of attempts for a particular packet
+%tSim = 10^6; % Simulation time for the entire system
 DIFS=5;      % Distributed InterFrame Spacing
 tColl = 10;  % Number Of Slots Collision b/w stations take up 
 tPacket = 20;% Average duration of each packet, same for all stations
@@ -37,7 +38,7 @@ while n <= (tSim-(tPacket+DIFS)) % While time indice is lesser than maximum tSim
  if(channel_status == 0) % Checking if channel is idle
    
    for j=1:N % For each user
-       if(succFlag(j)==1)
+       if(succFlag(j)==1 || nSuccColl(j)==(k-1))
            bCount(j) = bCount(j) + b(j);
            R(j) = R(j) + R_packet(j);
            b(j)=0;
@@ -71,7 +72,7 @@ while n <= (tSim-(tPacket+DIFS)) % While time indice is lesser than maximum tSim
     totColl(attemptTransmit==1) = totColl(attemptTransmit==1) + 1; % Increment total collison for those users by one
     nSuccColl = succColl(k,attemptTransmit,nSuccColl,succFlag); % Updating the successive collision number for all users
     succFlag(attemptTransmit==1) = 0;
-    CW(nSuccColl==k) = CWmin; %If k successive collisions have happened then the packet is discarded and CW 
+    CW(nSuccColl==(k-1)) = CWmin; %If k successive collisions have happened then the packet is discarded and CW 
                               %for that user is reset to CWmin
     for l = find(attemptTransmit==1) % For all those users who have collided
         backOff(l) = randi([0 CW(l)]); % Uniformly sample the backOff window from the new CW size
@@ -89,7 +90,7 @@ while n <= (tSim-(tPacket+DIFS)) % While time indice is lesser than maximum tSim
 end
 
 % Transmission Attempt
-totTransmitAttempt =sum(attemptTransmit,1);
+%totTransmitAttempt =sum(attemptTransmit,1);
 
 % betaSim = sum(attemptTransmit,1)./bCount;
 % errBeta = ((beta-betaSim)./beta)*100 ;
@@ -115,3 +116,4 @@ E_Delay = delayAnalytic(k,N,beta,gamma,tColl + DIFS,tPacket + DIFS,CWmin,CWmax);
 
 S_sim = countSucc/n;
 S = throughPutSys(N,beta,tPacket,tPacket+DIFS,tColl+DIFS);
+end
