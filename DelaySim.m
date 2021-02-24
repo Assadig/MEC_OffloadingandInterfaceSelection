@@ -1,8 +1,8 @@
 % Plot Settings
 m= {'+','o','*','x','v','d','^','s','>','<','o'};
 
-N=10:10:50;
-k = [7];
+N=10:10:100;
+k = 100;
 tSim = 10^6*(1:length(N));
 
 E_Delay = cell(length(N),length(k));
@@ -53,7 +53,7 @@ grid on
 plot(N,S(1:lSim,1),append('-',m{1},'k'),'Linewidth',2,'MarkerSize',12);
 plot(N,S_sim(1:lSim,1),append('-',m{2},'r'),'Linewidth',2,'MarkerSize',12);
 legend('Analytical','Simulation','FontSize',10)
-annotation('textbox',[0.65,0.4,0.25,0.07],'String',"K(max attempts)= 7")
+annotation('textbox',[0.6,0.4,0.3,0.07],'String',"K(max attempts)= 100")
 title('System Throughput','FontSize',16,'FontWeight','bold','Color','k','Fontname', 'Arial','Interpreter', 'latex')
 xlabel('Number Of Contending Stations','FontSize',14,'FontWeight','bold','Color','k','Fontname', 'Arial','Interpreter', 'latex')
 ylabel('System Throughput','FontSize',14,'FontWeight','bold','Color','k','Fontname', 'Arial','Interpreter', 'latex')
@@ -66,7 +66,7 @@ grid on
 plot(N,E_DelayplotUser(1,:),append('-',m{1},'k'),'Linewidth',2,'MarkerSize',12);
 hold on
 plot(N,E_DelayplotUserSim(1,:),append('-',m{2},'r'),'Linewidth',2,'MarkerSize',12);
-annotation('textbox',[0.65,0.4,0.25,0.07],'String',"K(max attempts)= 7")
+annotation('textbox',[0.6,0.4,0.3,0.07],'String',"K(max attempts)= 100")
 legend('Analytical','Simulation','FontSize',10,'Location','southeast')
 title('Average Delay','FontSize',16,'FontWeight','bold','Color','k','Fontname', 'Arial','Interpreter', 'latex')
 xlabel('Number Of Contending Users','FontSize',14,'FontWeight','bold','Color','k','Fontname', 'Arial','Interpreter', 'latex')
@@ -79,7 +79,7 @@ hold all
 grid on
 plot(N,beta_plotUser(1,:),append('-',m{1},'k'),'Linewidth',2,'MarkerSize',12);
 plot(N,beta_plotUserSim(1,:),append('-',m{2},'r'),'Linewidth',2,'MarkerSize',12);
-annotation('textbox',[0.65,0.4,0.25,0.07],'String',"K(max attempts)= 7")
+annotation('textbox',[0.6,0.4,0.3,0.07],'String',"K(max attempts)= 100")
 legend('Analytical','Simulation','FontSize',10)
 title('Transmission Probability','FontSize',16,'FontWeight','bold','Color','k','Fontname', 'Arial','Interpreter', 'latex')
 xlabel('Number Of Contending Users','FontSize',14,'FontWeight','bold','Color','k','Fontname', 'Arial','Interpreter', 'latex')
@@ -92,7 +92,7 @@ hold all
 grid on
 plot(N,gamma_plotUser(1,:),append('-',m{1},'k'),'Linewidth',2,'MarkerSize',12);
 plot(N,gamma_plotUserSim(1,:),append('-',m{2},'r'),'Linewidth',2,'MarkerSize',12);
-annotation('textbox',[0.65,0.4,0.25,0.07],'String',"K(max attempts)= 7")
+annotation('textbox',[0.6,0.4,0.3,0.07],'String',"K(max attempts)= 100")
 legend('Analytical','Simulation','FontSize',10,'Location','southeast')
 title('Conditional Collision Probability','FontSize',16,'FontWeight','bold','Color','k','Fontname', 'Arial','Interpreter', 'latex')
 xlabel('Number Of Contending Users','FontSize',14,'FontWeight','bold','Color','k','Fontname', 'Arial','Interpreter', 'latex')
