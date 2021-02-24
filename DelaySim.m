@@ -1,60 +1,50 @@
 % Plot Settings
 m= {'+','o','*','x','v','d','^','s','>','<','o'};
-plotVar=0;
 
-% Slot settings for each case
-DIFS=5;      % Distributed InterFrame Spacing
-tColl = 10;  % Number Of Slots Collision b/w stations take up 
-tPacket = 20;% Average duration of each packet, same for all stations
-tSim = 10*10^6; % Total simulation time in slots
-timeColl = 0;% Counter for succesfull tr channel busy duration
-timeSucc = 0;% Counter for collision on channel busy duration
-c=0;
-n=0;
-x=50:10:50;
-E_Delay = cell(length(x),2);
-E_DelaySim = cell(length(x),2);
+%N=10:10:100;
+N=10;
+k = [2];
+tSim = 10^6*(1:length(N));
+tSim(tSim>6*10^6) = 6*10^6;
+tSim (tSim < 3*10^6) = 3*10^6;
+E_Delay = cell(length(N),length(k));
+E_DelaySim = cell(length(N),length(k));
 
-beta = cell(length(x),2);
-betaSim = cell(length(x),2);
-gamma = cell(length(x),2);
-gammaSim = cell(length(x),2);
+beta = cell(length(N),length(k));
+betaSim = cell(length(N),length(k));
+gamma = cell(length(N),length(k));
+gammaSim = cell(length(N),length(k));
 
-S = zeros(length(x),2);
-S_sim = zeros(length(x),2);
-for N = 50:10:50
-for k = [7]
-plotVar = plotVar+1;
-
-
-
+S = zeros(length(N),length(k));
+S_sim = zeros(length(N),length(k));
+for i = 1:length(N)
+for j = 1:length(k)
+    [S(i,j),S_sim(i,j),E_Delay{i,j},E_DelaySim{i,j},beta{i,j},betaSim{i,j},gamma{i,j},gammaSim{i,j}] = DelaySimSyst(k(j),N(i),tSim(i));
 end
-plotVar = 0;
 end
 
-plotUser = 10;
-N_plot = 50:10:50 ;
-lSim = length(N_plot);
+plotUser = 1;
+lSim = length(N);
 
-E_DelayplotUser = zeros(2,lSim);
-E_DelayplotUserSim = zeros(2,lSim);
+E_DelayplotUser = zeros(length(k),lSim);
+E_DelayplotUserSim = zeros(length(k),lSim);
 
-beta_plotUser = zeros(2,lSim);
-beta_plotUserSim = zeros(2,lSim);
+beta_plotUser = zeros(length(k),lSim);
+beta_plotUserSim = zeros(length(k),lSim);
 
-gamma_plotUser = zeros(2,lSim);
-gamma_plotUserSim = zeros(2,lSim);
+gamma_plotUser = zeros(length(k),lSim);
+gamma_plotUserSim = zeros(length(k),lSim);
 
-for x = 1:1
+for i = 1:length(k)
     for v=1:lSim
-        E_DelayplotUserSim(x,v) = E_DelaySim{v,x}(plotUser);
-        E_DelayplotUser(x,v) = E_Delay{v,x};
+        E_DelayplotUserSim(i,v) = E_DelaySim{v,i}(plotUser);
+        E_DelayplotUser(i,v) = E_Delay{v,i};
         
-        beta_plotUserSim(x,v) = betaSim{v,x}(plotUser);
-        beta_plotUser(x,v) = beta{v,x};
+        beta_plotUserSim(i,v) = betaSim{v,i}(plotUser);
+        beta_plotUser(i,v) = beta{v,i};
         
-        gamma_plotUserSim(x,v) = gammaSim{v,x}(plotUser);
-        gamma_plotUser(x,v) = gamma{v,x};
+        gamma_plotUserSim(i,v) = gammaSim{v,i}(plotUser);
+        gamma_plotUser(i,v) = gamma{v,i};
     end
 end
 
@@ -62,8 +52,8 @@ figure(1)
 
 hold all
 grid on
-plot(N_plot,S(1:lSim,1),append('-',m{1},'k'),'Linewidth',2,'MarkerSize',12);
-plot(N_plot,S_sim(1:lSim,1),append('-',m{2},'r'),'Linewidth',2,'MarkerSize',12);
+plot(N(1:end-1),S(1:lSim-1,1),append('-',m{1},'k'),'Linewidth',2,'MarkerSize',12);
+plot(N(1:end-1),S_sim(1:lSim-1,1),append('-',m{2},'r'),'Linewidth',2,'MarkerSize',12);
 legend('Analytical','Simulation','FontSize',10)
 annotation('textbox',[0.65,0.4,0.25,0.07],'String',"K(max attempts)= 7")
 title('System Throughput','FontSize',16,'FontWeight','bold','Color','k','Fontname', 'Arial','Interpreter', 'latex')
@@ -75,9 +65,9 @@ figure(2)
 
 hold all
 grid on
-plot(N_plot,E_DelayplotUser(1,:),append('-',m{1},'k'),'Linewidth',2,'MarkerSize',12);
+plot(N(1:lSim-1),E_DelayplotUser(1,1:lSim-1),append('-',m{1},'k'),'Linewidth',2,'MarkerSize',12);
 hold on
-plot(N_plot,E_DelayplotUserSim(1,:),append('-',m{2},'r'),'Linewidth',2,'MarkerSize',12);
+plot(N(1:lSim-1),E_DelayplotUserSim(1,1:lSim-1),append('-',m{2},'r'),'Linewidth',2,'MarkerSize',12);
 annotation('textbox',[0.65,0.4,0.25,0.07],'String',"K(max attempts)= 7")
 legend('Analytical','Simulation','FontSize',10,'Location','southeast')
 title('Average Delay','FontSize',16,'FontWeight','bold','Color','k','Fontname', 'Arial','Interpreter', 'latex')
@@ -89,8 +79,8 @@ figure(3)
 
 hold all
 grid on
-plot(N_plot,beta_plotUser(1,:),append('-',m{1},'k'),'Linewidth',2,'MarkerSize',12);
-plot(N_plot,beta_plotUserSim(1,:),append('-',m{2},'r'),'Linewidth',2,'MarkerSize',12);
+plot(N(1:lSim-1),beta_plotUser(1,1:lSim-1),append('-',m{1},'k'),'Linewidth',2,'MarkerSize',12);
+plot(N(1:lSim-1),beta_plotUserSim(1,1:lSim-1),append('-',m{2},'r'),'Linewidth',2,'MarkerSize',12);
 annotation('textbox',[0.65,0.4,0.25,0.07],'String',"K(max attempts)= 7")
 legend('Analytical','Simulation','FontSize',10)
 title('Transmission Probability','FontSize',16,'FontWeight','bold','Color','k','Fontname', 'Arial','Interpreter', 'latex')
@@ -102,8 +92,8 @@ figure(4)
 
 hold all
 grid on
-plot(N_plot,gamma_plotUser(1,:),append('-',m{1},'k'),'Linewidth',2,'MarkerSize',12);
-plot(N_plot,gamma_plotUserSim(1,:),append('-',m{2},'r'),'Linewidth',2,'MarkerSize',12);
+plot(N(1:lSim-1),gamma_plotUser(1,(1:lSim-1)),append('-',m{1},'k'),'Linewidth',2,'MarkerSize',12);
+plot(N(1:lSim-1),gamma_plotUserSim(1,(1:lSim-1)),append('-',m{2},'r'),'Linewidth',2,'MarkerSize',12);
 annotation('textbox',[0.65,0.4,0.25,0.07],'String',"K(max attempts)= 7")
 legend('Analytical','Simulation','FontSize',10,'Location','southeast')
 title('Conditional Collision Probability','FontSize',16,'FontWeight','bold','Color','k','Fontname', 'Arial','Interpreter', 'latex')
