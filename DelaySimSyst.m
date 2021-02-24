@@ -1,5 +1,5 @@
 function [S,S_sim,E_Delay,E_DelaySim,beta,betaSim,gamma,gammaSim] = DelaySimSyst(k,N,tSim)
-%N=30;% Number of Contending Users
+%N=40;% Number of Contending Users
 %k=7;% Maximum number of attempts for a particular packet
 %tSim = 3*10^6; % Simulation time for the entire system
 
