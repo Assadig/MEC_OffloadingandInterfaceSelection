@@ -20,8 +20,11 @@ function [E_delay] = delayAnalytic(k,N,beta,gamma,Tcoll,Tsucc,CWmin,CWmax)
     Ps = ((N-1)*beta*(1-beta)^(N-2))/Pa; % Successfull tr prob for the N-1 users
     
     Trc = (1-beta)^(N-1) + Pa*Ps*(Tsucc) + Pa*(1-Ps)*(Tcoll); % Renewal time for a particular selected user
+    %T_disc = (sum(b_mean)*Trc + k*Tcoll);
+    %gamma_disc = gamma^k;
+    
     for i=0:k % For all the attempts
         E_delay = E_delay + (sum(b_mean(1:i+1))*Trc + i*(Tcoll) + (Tsucc))*(gamma^i)*(1-gamma);  % Delay expression 
     end
-    
+    %E_delay = E_delay + T_disc/(1-gamma_disc);
 end
