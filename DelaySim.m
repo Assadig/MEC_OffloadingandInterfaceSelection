@@ -2,7 +2,7 @@
 m= {'+','o','*','x','v','d','^','s','>','<','o'};
 
 N=10:10:100;
-k = 100;
+k = [7 100];
 tSim = 10^6*(1:length(N));
 
 E_Delay = cell(length(N),length(k));
@@ -21,8 +21,9 @@ for j = 1:length(k)
 end
 end
 
-plotUser = 1;
+plotUser = 4;
 lSim = length(N);
+k_plot=1;
 
 E_DelayplotUser = zeros(length(k),lSim);
 E_DelayplotUserSim = zeros(length(k),lSim);
@@ -46,58 +47,103 @@ for i = 1:length(k)
     end
 end
 
+
 figure(1)
 
-hold all
-grid on
-plot(N,S(1:lSim,1),append('-',m{1},'k'),'Linewidth',2,'MarkerSize',12);
-plot(N,S_sim(1:lSim,1),append('-',m{2},'r'),'Linewidth',2,'MarkerSize',12);
-legend('Analytical','Simulation','FontSize',10)
-annotation('textbox',[0.6,0.4,0.3,0.07],'String',"K(max attempts)= 100")
+subplot(211)
+
+plot(N,S(1:lSim,k_plot),append('-',m{k_plot},'k'),'Linewidth',2,'MarkerSize',12);
+hold on
+plot(N,S_sim(1:lSim,k_plot),append('-',m{k_plot+1},'r'),'Linewidth',2,'MarkerSize',12);
+legend(append("Analytical: K=",int2str(k(k_plot))),append("Simulation: K=",int2str(k(k_plot))),'FontSize',10)
 title('System Throughput','FontSize',16,'FontWeight','bold','Color','k','Fontname', 'Arial','Interpreter', 'latex')
+%xlabel('Number Of Contending Stations','FontSize',14,'FontWeight','bold','Color','k','Fontname', 'Arial','Interpreter', 'latex')
+ylabel('System Throughput','FontSize',14,'FontWeight','bold','Color','k','Fontname', 'Arial','Interpreter', 'latex')
+legend show
+grid on
+subplot(212)
+plot(N,S(1:lSim,k_plot+1),append('-',m{k_plot},'k'),'Linewidth',2,'MarkerSize',12);
+hold on
+plot(N,S_sim(1:lSim,k_plot+1),append('-',m{k_plot+1},'r'),'Linewidth',2,'MarkerSize',12);
+legend(append("Analytical: K=",int2str(k(k_plot+1))),append("Simulation: K=",int2str(k(k_plot+1))),'FontSize',10,'Location','best')
+%title('System Throughput','FontSize',16,'FontWeight','bold','Color','k','Fontname', 'Arial','Interpreter', 'latex')
 xlabel('Number Of Contending Stations','FontSize',14,'FontWeight','bold','Color','k','Fontname', 'Arial','Interpreter', 'latex')
 ylabel('System Throughput','FontSize',14,'FontWeight','bold','Color','k','Fontname', 'Arial','Interpreter', 'latex')
 legend show
+grid on
 
 figure(2)
 
-hold all
-grid on
-plot(N,E_DelayplotUser(1,:),append('-',m{1},'k'),'Linewidth',2,'MarkerSize',12);
+subplot(211)
+plot(N,E_DelayplotUser(k_plot,:),append('-',m{k_plot},'k'),'Linewidth',2,'MarkerSize',12);
 hold on
-plot(N,E_DelayplotUserSim(1,:),append('-',m{2},'r'),'Linewidth',2,'MarkerSize',12);
-annotation('textbox',[0.6,0.4,0.3,0.07],'String',"K(max attempts)= 100")
-legend('Analytical','Simulation','FontSize',10,'Location','southeast')
+plot(N,E_DelayplotUserSim(k_plot,:),append('-',m{k_plot+1},'r'),'Linewidth',2,'MarkerSize',12);
+legend(append("Analytical: K)=",int2str(k(k_plot))),append("Simulation: K=",int2str(k(k_plot))),'FontSize',10,'Location','best')
 title('Average Delay','FontSize',16,'FontWeight','bold','Color','k','Fontname', 'Arial','Interpreter', 'latex')
-xlabel('Number Of Contending Users','FontSize',14,'FontWeight','bold','Color','k','Fontname', 'Arial','Interpreter', 'latex')
-ylabel('Average Delay($E[Delay]$)','FontSize',14,'FontWeight','bold','Color','k','Fontname', 'Arial','Interpreter', 'latex')
+%xlabel('Number Of Contending Stations','FontSize',14,'FontWeight','bold','Color','k','Fontname', 'Arial','Interpreter', 'latex')
+ylabel('E[Delay]','FontSize',14,'FontWeight','bold','Color','k','Fontname', 'Arial','Interpreter', 'latex')
 legend show
+grid on
+
+subplot(212)
+plot(N,E_DelayplotUser(k_plot+1,:),append('-',m{k_plot},'k'),'Linewidth',2,'MarkerSize',12);
+hold on
+plot(N,E_DelayplotUserSim(k_plot+1,:),append('-',m{k_plot+1},'r'),'Linewidth',2,'MarkerSize',12);
+legend(append("Analytical: K=",int2str(k(k_plot+1))),append("Simulation: K=",int2str(k(k_plot+1))),'FontSize',10,'Location','best')
+%title('System Throughput','FontSize',16,'FontWeight','bold','Color','k','Fontname', 'Arial','Interpreter', 'latex')
+xlabel('Number Of Contending Stations','FontSize',14,'FontWeight','bold','Color','k','Fontname', 'Arial','Interpreter', 'latex')
+ylabel('E[Delay]','FontSize',14,'FontWeight','bold','Color','k','Fontname', 'Arial','Interpreter', 'latex')
+legend show
+grid on
 
 figure(3)
 
-hold all
-grid on
-plot(N,beta_plotUser(1,:),append('-',m{1},'k'),'Linewidth',2,'MarkerSize',12);
-plot(N,beta_plotUserSim(1,:),append('-',m{2},'r'),'Linewidth',2,'MarkerSize',12);
-annotation('textbox',[0.6,0.4,0.3,0.07],'String',"K(max attempts)= 100")
-legend('Analytical','Simulation','FontSize',10)
+subplot(211)
+plot(N,beta_plotUser(k_plot,:),append('-',m{k_plot},'k'),'Linewidth',2,'MarkerSize',12);
+hold on
+plot(N,beta_plotUserSim(k_plot,:),append('-',m{k_plot+1},'r'),'Linewidth',2,'MarkerSize',12);
+legend(append("Analytical: K=",int2str(k(k_plot))),append("Simulation: K=",int2str(k(k_plot))),'FontSize',10,'Location','best')
 title('Transmission Probability','FontSize',16,'FontWeight','bold','Color','k','Fontname', 'Arial','Interpreter', 'latex')
-xlabel('Number Of Contending Users','FontSize',14,'FontWeight','bold','Color','k','Fontname', 'Arial','Interpreter', 'latex')
-ylabel('Transmission Probability($\beta$)','FontSize',14,'FontWeight','bold','Color','k','Fontname', 'Arial','Interpreter', 'latex')
+%xlabel('Number Of Contending Stations','FontSize',14,'FontWeight','bold','Color','k','Fontname', 'Arial','Interpreter', 'latex')
+ylabel('$\beta$','FontSize',14,'FontWeight','bold','Color','k','Fontname', 'Arial','Interpreter', 'latex')
 legend show
+grid on
+
+subplot(212)
+plot(N,beta_plotUser(k_plot+1,:),append('-',m{k_plot},'k'),'Linewidth',2,'MarkerSize',12);
+hold on
+plot(N,beta_plotUserSim(k_plot+1,:),append('-',m{k_plot+1},'r'),'Linewidth',2,'MarkerSize',12);
+legend(append("Analytical: K=",int2str(k(k_plot+1))),append("Simulation: K=",int2str(k(k_plot+1))),'FontSize',10,'Location','best')
+%title('System Throughput','FontSize',16,'FontWeight','bold','Color','k','Fontname', 'Arial','Interpreter', 'latex')
+xlabel('Number Of Contending Stations','FontSize',14,'FontWeight','bold','Color','k','Fontname', 'Arial','Interpreter', 'latex')
+ylabel('$\beta$','FontSize',14,'FontWeight','bold','Color','k','Fontname', 'Arial','Interpreter', 'latex')
+legend show
+grid on
+
 
 figure(4)
 
-hold all
-grid on
-plot(N,gamma_plotUser(1,:),append('-',m{1},'k'),'Linewidth',2,'MarkerSize',12);
-plot(N,gamma_plotUserSim(1,:),append('-',m{2},'r'),'Linewidth',2,'MarkerSize',12);
-annotation('textbox',[0.6,0.4,0.3,0.07],'String',"K(max attempts)= 100")
-legend('Analytical','Simulation','FontSize',10,'Location','southeast')
+subplot(211)
+plot(N,gamma_plotUser(k_plot,:),append('-',m{1},'k'),'Linewidth',2,'MarkerSize',12);
+hold on
+plot(N,gamma_plotUserSim(k_plot,:),append('-',m{2},'r'),'Linewidth',2,'MarkerSize',12);
+legend(append("Analytical: K=",int2str(k(k_plot))),append("Simulation: K=",int2str(k(k_plot))),'FontSize',10,'Location','best')
 title('Conditional Collision Probability','FontSize',16,'FontWeight','bold','Color','k','Fontname', 'Arial','Interpreter', 'latex')
-xlabel('Number Of Contending Users','FontSize',14,'FontWeight','bold','Color','k','Fontname', 'Arial','Interpreter', 'latex')
-ylabel('Conditional Collision Probability($\gamma$)','FontSize',14,'FontWeight','bold','Color','k','Fontname', 'Arial','Interpreter', 'latex')
+%xlabel('Number Of Contending Stations','FontSize',14,'FontWeight','bold','Color','k','Fontname', 'Arial','Interpreter', 'latex')
+ylabel('$\gamma$','FontSize',14,'FontWeight','bold','Color','k','Fontname', 'Arial','Interpreter', 'latex')
 legend show
+grid on
+
+subplot(212)
+plot(N,gamma_plotUser(k_plot+1,:),append('-',m{1},'k'),'Linewidth',2,'MarkerSize',12);
+hold on
+plot(N,gamma_plotUserSim(k_plot+1,:),append('-',m{2},'r'),'Linewidth',2,'MarkerSize',12);
+legend(append("Analytical: K=",int2str(k(k_plot+1))),append("Simulation: K=",int2str(k(k_plot+1))),'FontSize',10,'Location','best')
+%title('System Throughput','FontSize',16,'FontWeight','bold','Color','k','Fontname', 'Arial','Interpreter', 'latex')
+xlabel('Number Of Contending Stations','FontSize',14,'FontWeight','bold','Color','k','Fontname', 'Arial','Interpreter', 'latex')
+ylabel('$\gamma$','FontSize',14,'FontWeight','bold','Color','k','Fontname', 'Arial','Interpreter', 'latex')
+legend show
+grid on
 
 
 
