@@ -1,5 +1,7 @@
 function [beta, gamma] = sys_param(k,N)
-% Fixed Point Analysis taken from Prof. Anurags Kumar paper
+% Fixed Point Analysis taken from Prof. Anurags Kumar paper [1]
+% Function returns the steady state value of beta and gamma by taking in
+% the system setting determined by (k,N)
 
 CWmin = 16;
 CWmax = 1024;

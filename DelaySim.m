@@ -1,27 +1,39 @@
 % Plot Settings
 m= {'+','o','*','x','v','d','^','s','>','<','o'};
 
-N=10:10:100;
-k = [7 100];
-tSim = 10^6*(1:length(N));
+N=10:10:100; % User array
+k = [7 100]; % System simulated for two values of k
+tSim = 10^6*(1:length(N)); % To keep the number of attempts constant per user across all N
+                           % tSim is increased linearly
+% Defining all the system parameters as cells since each system setting
+% of (N,k) yields a different size array
 
-E_Delay = cell(length(N),length(k));
+% Delays
+E_Delay =  cell(length(N),length(k)); 
 E_DelaySim = cell(length(N),length(k));
 
+% Transmission probability 
 beta = cell(length(N),length(k));
 betaSim = cell(length(N),length(k));
+
+% Conditional probability
 gamma = cell(length(N),length(k));
 gammaSim = cell(length(N),length(k));
 
+% Throughput
 S = zeros(length(N),length(k));
 S_sim = zeros(length(N),length(k));
+
 for i = 1:length(N)
 for j = 1:length(k)
     [S(i,j),S_sim(i,j),E_Delay{i,j},E_DelaySim{i,j},beta{i,j},betaSim{i,j},gamma{i,j},gammaSim{i,j}] = DelaySimSyst(k(j),N(i),tSim(i));
 end
 end
 
-plotUser = 4;
+% Extract all the system parameters for a particular user as dtermined by
+% the variable plotUser
+
+plotUser = 4; % User number of 4 is picked to see the system performance
 lSim = length(N);
 k_plot=1;
 
