@@ -9,6 +9,8 @@ transmission is zero. Under these assumptions the entire system is simulated and
 1. System Throughput <img src="https://render.githubusercontent.com/render/math?math=(S)">
 1. Average Delay <img src="https://render.githubusercontent.com/render/math?math=(E[Delay])">
 
+The analytical solutions for the above parameters are based on the work by: 
+>[1] *A. Kumar, E. Altman, D. Miorandi, and M. Goyal*, **New insights from a fixed point analysis of single cell IEEE 802.11 WLANs,** in Proc. IEEE Infocom, Mar. 2005, pp. 1550–1561  
 
 ### Running the code:
 ```
