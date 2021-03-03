@@ -1,12 +1,12 @@
 N = 50;
 k=7;
-p=0.1;
+p=0.3;
 tSim = 10^6;
 
-tLocal = 180;
+tLocal = 150;
 tPacket = 20;
-DIFS = 5;
-tColl = 10;
+DIFS = 2;
+tColl = 5;
 CWmin = 16;
 CWmax = 1024;
 packetProc = zeros([1,N]);
@@ -33,6 +33,8 @@ nSuccColl = zeros(1,N_cont);
 discardFlag = zeros(1,N_cont);
 discardTime = zeros(1,N_cont);
 attemptTransmit=zeros(1,N_cont);
+succTime_WiFi = zeros(1,N);
+succTime_local = zeros(1,N);
 
 timeColl = 0;
 timeSucc = 0;
@@ -40,6 +42,7 @@ succUser=0;
 channel_status=0;
 d=0; % Variable that controls the indice for discardTime
 c=0;
+c_local=0;
 n=0;
 
 while n<=tSim
@@ -63,8 +66,18 @@ N_local = N_local - length(exitUsers_Local);
 
 temp = [userInterface{1,1}(exitUsers_Wifi),userInterface{2,1}(exitUsers_Local)];
 
-userInterface{1,1} = setdiff(userInterface{1,1},userInterface{1,1}(exitUsers_Wifi));
-userInterface{2,1} = setdiff(userInterface{2,1},userInterface{2,1}(exitUsers_Local));
+if(~isempty(userInterface{1,1}(exitUsers_Wifi)))
+    c=c+1;
+    succTime_WiFi(c,userInterface{1,1}(exitUsers_Wifi)) = n; 
+end
+
+if(~isempty(userInterface{2,1}(exitUsers_Local)))
+    c_local=c_local+1;
+    succTime_local(c_local,userInterface{2,1}(exitUsers_Local)) = n; 
+end
+
+userInterface{1,1} = setdiff(userInterface{1,1},userInterface{1,1}(exitUsers_Wifi),'stable');
+userInterface{2,1} = setdiff(userInterface{2,1},userInterface{2,1}(exitUsers_Local),'stable');
 
 if(~isempty([exitUsers_Wifi, exitUsers_Local]))
 for i=temp 
